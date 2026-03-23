@@ -4,7 +4,20 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="delegatedBuild" value="false" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/Kafka-basics" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/Kafka-basics" />
+          </set>
+        </option>
       </GradleProjectSettings>
     </option>
   </component>
