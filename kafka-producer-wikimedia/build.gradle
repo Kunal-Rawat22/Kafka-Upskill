@@ -13,6 +13,11 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation("org.slf4j:slf4j-api:2.0.17")
+    implementation("org.slf4j:slf4j-simple:2.0.17")
+    implementation("org.apache.kafka:kafka-clients:3.9.2")
+    implementation("com.squareup.okhttp3:okhttp:5.3.2")
+    implementation("com.launchdarkly:okhttp-eventsource:4.2.0")
 }
 
 test {
