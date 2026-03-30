@@ -13,6 +13,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.opensearch.action.bulk.BulkRequest;
 import org.opensearch.action.bulk.BulkResponse;
@@ -76,6 +77,20 @@ public class OpenSearchConsumer {
         KafkaConsumer<String, String> kafkaConsumer = createKafkaConsumer();
         ObjectMapper objectMapper = new ObjectMapper();
 
+        final Thread mainThread = Thread.currentThread();
+
+        // adding the shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("Detected a shutdown, let's exit by calling consumer.wakeup()...");
+            kafkaConsumer.wakeup();
+            // join the main thread to allow the execution of the code in the main thread to complete
+            try {
+                mainThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }));
+
         // We need to create index if it doesn't exist already
         try (openSearchClient; kafkaConsumer) {
             boolean indexExists = openSearchClient.indices().exists(new GetIndexRequest(INDEX_NAME), RequestOptions.DEFAULT);
@@ -126,6 +141,14 @@ public class OpenSearchConsumer {
                     log.info("Committed {} records", records.count());
                 }
             }
+        } catch (WakeupException e) {
+            log.info("The consumer is now starting to shutdown...");
+        } catch (Exception e) {
+            log.error("Error occurred while consuming messages", e);
+        } finally {
+            kafkaConsumer.close();   // this will also commit the offsets if needed
+            openSearchClient.close();
+            log.info("The consumer has now gracefully shutdown");
         }
 
     }
