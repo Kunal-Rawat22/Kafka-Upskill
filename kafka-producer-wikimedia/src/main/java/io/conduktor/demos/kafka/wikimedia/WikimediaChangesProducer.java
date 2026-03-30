@@ -38,17 +38,18 @@ public class WikimediaChangesProducer {
         producerProperties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");
         producerProperties.setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
 
+        // High throughput producer (at the expense of a bit of latency and CPU usage)
+        producerProperties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
+        producerProperties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
+        producerProperties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, String.valueOf(32 * 1024));
+
         // create the producer
         KafkaProducer<String, String> producer = new KafkaProducer<>(producerProperties);
 
         BackgroundEventSource eventSource = buildEventHandler(producer, topic, eventUrl);
-//        BackgroundEventHandler eventHandler = new WikimediaChangeHandler(producer, topic);
-//        EventSource.Builder eventSourceBuilder = new EventSource.Builder(URI.create(eventUrl));
-//        BackgroundEventSource.Builder builder = new BackgroundEventSource.Builder(eventHandler, eventSourceBuilder);
-//        BackgroundEventSource eventSource = builder.build();
         eventSource.start();
 
-        Thread.sleep(60000);
+        Thread.sleep(600000);
     }
 
     private static BackgroundEventSource buildEventHandler(final KafkaProducer<String, String> producer, String topic, String eventSourceUrl) {
