@@ -20,6 +20,7 @@ dependencies {
     implementation("org.opensearch.client:opensearch-rest-high-level-client:2.16.0")
     // Source: https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation("com.google.code.gson:gson:2.13.2")
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 }
 
 test {
